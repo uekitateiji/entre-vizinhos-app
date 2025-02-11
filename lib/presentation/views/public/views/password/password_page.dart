@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../forgot_password/forgot_password_page.dart';
-import '../../../../shared/components/custom_app_bar.dart';
+import '../../../../shared/widgets/widgets.dart';
 
 class PasswordPage extends StatefulWidget {
   final String email;
@@ -12,9 +12,10 @@ class PasswordPage extends StatefulWidget {
   State<PasswordPage> createState() => _PasswordPageState();
 }
 
-class _PasswordPageState extends State<PasswordPage> with SingleTickerProviderStateMixin {
+class _PasswordPageState extends State<PasswordPage>
+    with SingleTickerProviderStateMixin {
   String _password = "";
-  final String _correctPassword = "123456"; 
+  final String _correctPassword = "123456";
   bool _isPasswordValid = true;
   late AnimationController _shakeController;
   late Animation<double> _shakeAnimation;
@@ -50,7 +51,7 @@ class _PasswordPageState extends State<PasswordPage> with SingleTickerProviderSt
     if (_password.isNotEmpty) {
       setState(() {
         _password = _password.substring(0, _password.length - 1);
-        _isPasswordValid = true; 
+        _isPasswordValid = true;
       });
     }
   }
@@ -104,12 +105,6 @@ class _PasswordPageState extends State<PasswordPage> with SingleTickerProviderSt
       ),
       body: Stack(
         children: [
-          Positioned.fill(
-            child: Image.asset(
-              "assets/background-acessar-conta.png",
-              fit: BoxFit.cover,
-            ),
-          ),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -119,36 +114,37 @@ class _PasswordPageState extends State<PasswordPage> with SingleTickerProviderSt
                   const SizedBox(height: 70),
                   const Center(
                     child: Text(
-                      "Hello, Teiji",
+                      "Oie, Teiji!",
                       style: TextStyle(
-                        fontSize: 26,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 45),
+                  const SizedBox(height: 48),
                   Transform.translate(
-                    offset: Offset(_isPasswordValid ? 0 : _shakeAnimation.value, 0),
+                    offset:
+                        Offset(_isPasswordValid ? 0 : _shakeAnimation.value, 0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(6, (index) {
                         return AnimatedContainer(
                           duration: const Duration(milliseconds: 100),
                           curve: Curves.easeInOut,
-                          margin: const EdgeInsets.symmetric(horizontal: 6),
+                          margin: const EdgeInsets.symmetric(horizontal: 16),
                           width: 12,
                           height: 12,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: index < _password.length
-                                ? (_isPasswordValid ? Colors.green : Colors.red)
-                                : Colors.grey.shade300,
+                                ? (_isPasswordValid ? Theme.of(context).colorScheme.primary : Colors.red)
+                                : const Color(0xffD9D9D9),
                           ),
                         );
                       }),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 32),
                   const Center(
                     child: Text(
                       "Digite sua senha",
@@ -192,9 +188,10 @@ class _PasswordPageState extends State<PasswordPage> with SingleTickerProviderSt
                                   ),
                                 );
                               },
-                              child: const Text(
+                              child: Text(
                                 "Esqueceu a sua senha?",
-                                style: TextStyle(fontSize: 16, color: Colors.black54),
+                                style: TextStyle(
+                                    fontSize: 16, color: Theme.of(context).colorScheme.surfaceContainerHigh),
                               ),
                             ),
                           ),
@@ -220,13 +217,17 @@ class _PasswordPageState extends State<PasswordPage> with SingleTickerProviderSt
         child: ElevatedButton(
           onPressed: () => _onNumberPressed(number),
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey.shade200,
+            backgroundColor: const Color(0xffD9D9D9),
             shape: const CircleBorder(),
             padding: EdgeInsets.zero,
           ),
           child: Text(
             number,
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w500, color: Colors.black),
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w400,
+              color: Colors.black.withOpacity(0.5),
+            ),
           ),
         ),
       ),

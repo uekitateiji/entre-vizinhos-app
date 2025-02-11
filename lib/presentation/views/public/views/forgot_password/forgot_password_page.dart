@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../shared/components/custom_button.dart';
+import '../../../../shared/widgets/widgets.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -9,114 +9,116 @@ class ForgotPasswordPage extends StatefulWidget {
 }
 
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
-  String _selectedMethod = 'SMS'; // Opção inicial
+  final TextEditingController _novaSenhaController = TextEditingController();
+  final TextEditingController _confirmarSenhaController = TextEditingController();
+  final FocusNode _novaSenhaFocusNode = FocusNode();
+  final FocusNode _confirmarSenhaFocusNode = FocusNode();
+
+  bool _novaSenhaValida = true;
+  bool _confirmarSenhaValida = true;
+  bool _isObscured = true;
+
+  void _validarSenha() {
+    setState(() {
+      _novaSenhaValida = _novaSenhaController.text.length == 6;
+      _confirmarSenhaValida = _novaSenhaController.text == _confirmarSenhaController.text;
+    });
+  }
+
+  void _togglePasswordVisibility() {
+    setState(() {
+      _isObscured = !_isObscured;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
+      extendBodyBehindAppBar: true,
+      appBar: CustomAppBar(
+        icon: Icons.arrow_back,
+        onIconPressed: () {
+          Navigator.pop(context);
+        },
+      ),
       body: Stack(
         children: [
-          // Background verde no topo
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 200,
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.green,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(50),
-                  bottomRight: Radius.circular(50),
-                ),
-              ),
+          Positioned.fill(
+            child: Image.asset(
+              "assets/background-right.png",
+              fit: BoxFit.cover,
             ),
           ),
-
           SafeArea(
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-
-                // Avatar
-                Container(
-                  width: 90,
-                  height: 90,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    border: Border.all(color: Colors.grey.shade300, width: 2),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Título "Recuperar senha"
-                const Text(
-                  "Recuperar senha",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                // Texto "Como você gostaria de recuperar sua senha?"
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 40),
-                  child: Text(
-                    "Como você gostaria de recuperar sua senha?",
-                    textAlign: TextAlign.center,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Spacer(flex: 4),
+                  const Text(
+                    "Redefinição de senha",
                     style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black54,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
                   ),
-                ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "Digite uma nova senha e confirme para continuar.",
+                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                  ),
+                  const Spacer(flex: 3),
 
-                const SizedBox(height: 20),
+                  // **Campo Nova Senha**
+                  ExpandedPasswordFormField(
+                    label: "Nova Senha",
+                    controller: _novaSenhaController,
+                    error: !_novaSenhaValida,
+                    errorMessage: "A senha deve ter 6 caracteres",
+                    focusNode: _novaSenhaFocusNode,
+                    showIcon: true,
+                  ),
+                  const SizedBox(height: 16),
 
-                // Opções de seleção (SMS e Email)
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.15),
-                  child: Column(
+                  // **Campo Confirmar Senha**
+                  ExpandedPasswordFormField(
+                    label: "Confirme a nova senha",
+                    controller: _confirmarSenhaController,
+                    error: !_confirmarSenhaValida,
+                    errorMessage: "Os campos devem ser iguais",
+                    focusNode: _confirmarSenhaFocusNode,
+                  ),
+                  const Spacer(flex: 3),
+
+                  // **Botões Fixos na Parte Inferior**
+                  Column(
                     children: [
-                      _buildRecoveryOption("SMS"),
-                      _buildRecoveryOption("Email"),
+                      CustomButton(
+                        text: "Avançar",
+                        onPressed: _validarSenha,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                      ),
+                      const SizedBox(height: 16),
+                      Align(
+                        alignment: Alignment.center,
+                        child: TextButton(
+                          onPressed: () {},
+                          child: const Text(
+                            "Cancelar",
+                            style: TextStyle(color: Colors.black54, fontSize: 16),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
                     ],
                   ),
-                ),
-
-                const Spacer(),
-
-                // Botão "Próximo"
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: CustomButton(
-                    text: "Próximo",
-                    onPressed: () {},
-                    backgroundColor: Colors.green,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Align(
-                  alignment: Alignment.center,
-                  child: TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      "Cancelar",
-                      style: TextStyle(fontSize: 14, color: Colors.black54),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -124,37 +126,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     );
   }
 
-  /// Widget para criar opções de recuperação de senha
-  Widget _buildRecoveryOption(String title) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 15),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: RadioListTile<String>(
-        title: Text(
-          title,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: _selectedMethod == title ? Colors.blue : Colors.black54,
-          ),
-        ),
-        value: title,
-        groupValue: _selectedMethod,
-        activeColor: Colors.blue,
-        onChanged: (value) {
-          setState(() {
-            _selectedMethod = value!;
-          });
-        },
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
-        ),
-        tileColor: Colors.transparent,
-        dense: true,
-      ),
-    );
+  @override
+  void dispose() {
+    _novaSenhaController.dispose();
+    _confirmarSenhaController.dispose();
+    _novaSenhaFocusNode.dispose();
+    _confirmarSenhaFocusNode.dispose();
+    super.dispose();
   }
 }

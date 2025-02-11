@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../login/login_page.dart';
-import '../../../../shared/components/custom_button.dart';
+import '../../../../shared/widgets/widgets.dart';
 
 class IntroPage extends StatelessWidget {
   const IntroPage({super.key});
@@ -8,7 +8,16 @@ class IntroPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(fontFamily: 'Poppins'),
+      theme: ThemeData(
+        fontFamily: 'Poppins',
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xff2D9BDB),
+            primary: const Color(0xff2D9BDB),
+            secondary: const Color(0xff27AE5F),
+            tertiary: const Color(0xffF2C94C),
+            surfaceBright: const Color(0xffF2F2F2),
+            surfaceContainerHigh: const Color(0xff333333)),
+      ),
       debugShowCheckedModeBanner: false,
       title: "Entre Vizinhos",
       home: const WelcomeScreen(),
@@ -29,7 +38,7 @@ class WelcomeScreen extends StatelessWidget {
         children: [
           Positioned.fill(
             child: Image.asset(
-              "assets/background-boas-vindas.png",
+              "assets/background-left.png",
               fit: BoxFit.cover,
             ),
           ),
@@ -60,9 +69,9 @@ class WelcomeScreen extends StatelessWidget {
                       CustomButton(
                         text: "Criar conta",
                         onPressed: () {},
-                        backgroundColor: Colors.green,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 16),
                       Align(
                         alignment: Alignment.center,
                         child: TextButton(

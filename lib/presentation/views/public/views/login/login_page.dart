@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../password/password_page.dart';
-import '../../../../shared/components/custom_app_bar.dart';
+import '../../../../shared/widgets/widgets.dart';
 
 class LoginPage extends StatefulWidget {
   final String? email;
@@ -14,34 +14,36 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   late TextEditingController _emailController;
   final FocusNode _emailFocusNode = FocusNode();
+  
   bool _isEmailValid = true;
-  String? _errorMessage;
   bool _hasStartedTyping = false;
+  bool _shouldShowSuccessIcon = false;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
     _emailController = TextEditingController(text: widget.email ?? "");
 
-    // Aguarda a primeira renderização para focar no campo de e-mail
+    // Foca no campo após o carregamento da tela
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        FocusScope.of(context).requestFocus(_emailFocusNode);
-      }
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (mounted) {
+          FocusScope.of(context).requestFocus(_emailFocusNode);
+        }
+      });
     });
 
-    // Monitora mudanças no texto para ativar a validação após o usuário começar a digitar
     _emailController.addListener(_onTextChanged);
   }
 
   bool _validateEmail(String email) {
-    return RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
-        .hasMatch(email);
+    return RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(email);
   }
 
   void _onTextChanged() {
     String email = _emailController.text.trim();
-
+    
     if (!_hasStartedTyping && email.isNotEmpty) {
       setState(() {
         _hasStartedTyping = true;
@@ -50,8 +52,10 @@ class _LoginPageState extends State<LoginPage> {
 
     if (_hasStartedTyping) {
       bool isValid = _validateEmail(email);
+      
       setState(() {
         _isEmailValid = isValid;
+        _shouldShowSuccessIcon = isValid && email.isNotEmpty;
         _errorMessage = isValid ? null : "Por favor, insira um e-mail válido!";
       });
     }
@@ -63,6 +67,7 @@ class _LoginPageState extends State<LoginPage> {
 
     setState(() {
       _isEmailValid = isValid;
+      _shouldShowSuccessIcon = isValid;
       _errorMessage = isValid ? null : "Por favor, insira um e-mail válido!";
     });
 
@@ -98,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           Positioned.fill(
             child: Image.asset(
-              "assets/background-acessar-conta.png",
+              "assets/background-right.png",
               fit: BoxFit.cover,
             ),
           ),
@@ -141,7 +146,8 @@ class _LoginPageState extends State<LoginPage> {
                                       color: Colors.black54,
                                     ),
                                   ),
-                                  Icon(Icons.favorite, color: Colors.red, size: 18),
+                                  Icon(Icons.favorite,
+                                      color: Colors.red, size: 18),
                                 ],
                               ),
                             ],
@@ -156,61 +162,16 @@ class _LoginPageState extends State<LoginPage> {
                           right: screenWidth * 0.06,
                           child: Column(
                             children: [
-                              TextField(
+                              ExpandedTextFormField(
+                                label: 'Digite o seu e-mail',
+                                onActionButton: _onEmailSubmit,
+                                error: !_isEmailValid,
                                 controller: _emailController,
                                 focusNode: _emailFocusNode,
                                 keyboardType: TextInputType.emailAddress,
-                                decoration: InputDecoration(
-                                  hintText: "Digite o seu e-mail",
-                                  hintStyle: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black54,
-                                  ),
-                                  enabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: _hasStartedTyping
-                                          ? (_isEmailValid ? Colors.green : Colors.red)
-                                          : Colors.grey,
-                                    ),
-                                  ),
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: _hasStartedTyping
-                                          ? (_isEmailValid ? Colors.green : Colors.red)
-                                          : Colors.grey,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  suffixIcon: Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: Container(
-                                      width: 40,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        color: _hasStartedTyping
-                                            ? (_isEmailValid ? Colors.green : Colors.grey)
-                                            : Colors.grey,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: IconButton(
-                                        icon: const Icon(Icons.arrow_forward, color: Colors.white),
-                                        onPressed: _onEmailSubmit,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                errorMessage: _errorMessage,
+                                isValid: _shouldShowSuccessIcon,
                               ),
-                              if (_errorMessage != null && _hasStartedTyping)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: Text(
-                                    _errorMessage!,
-                                    style: const TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
                             ],
                           ),
                         ),
