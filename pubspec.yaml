@@ -47,16 +47,15 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
 
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
-
-# The following section is specific to Flutter packages.
 flutter:
   assets:
     - assets/background-boas-vindas.png
     - assets/background-acessar-conta.png
     - assets/background-left.png
     - assets/background-right.png
+    - assets/banner-1.png
+    - assets/banner-2.png
+    - assets/banner-3.png
   fonts:
   - family: Poppins
     fonts:
@@ -67,6 +66,9 @@ flutter:
         weight: 500
       - asset: assets/fonts/Poppins-Light.ttf
         weight: 300
+  - family: PlusJakartaSans
+    fonts:
+      - asset: assets/fonts/PlusJakartaSans-VariableFont_wght.ttf
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
