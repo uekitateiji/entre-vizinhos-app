@@ -53,6 +53,9 @@ flutter:
     - assets/banner-2.png
     - assets/banner-3.png
     - assets/icons/icon-google.png
+    - assets/images/lancer-ralliart.png
+    - assets/images/pc-gamer.png
+    - assets/images/sofa.png
   fonts:
   - family: Poppins
     fonts:

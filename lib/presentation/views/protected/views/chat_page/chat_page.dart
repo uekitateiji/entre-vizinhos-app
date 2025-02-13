@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class ChatPage extends StatelessWidget {
+  const ChatPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(
-        child: Text("Página Inicial", style: TextStyle(fontSize: 20)),
+        child: Text("Página do Menu", style: TextStyle(fontSize: 20)),
       ),
     );
   }

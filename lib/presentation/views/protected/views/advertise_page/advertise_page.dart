@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class AdvertisePage extends StatelessWidget {
+  const AdvertisePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(
-        child: Text("Página Inicial", style: TextStyle(fontSize: 20)),
+        child: Text("Anúncios", style: TextStyle(fontSize: 20)),
       ),
     );
   }

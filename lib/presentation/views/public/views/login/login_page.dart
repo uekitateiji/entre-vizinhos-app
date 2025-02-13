@@ -1,6 +1,7 @@
-import 'package:entre_vizinhos_app/presentation/views/protected/views/home/home_page.dart';
+import 'package:entre_vizinhos_app/presentation/views/protected/views/main_screen.dart';
 import 'package:flutter/material.dart';
 import '../../../../shared/widgets/widgets.dart';
+import '../../../protected/views/home/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -74,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
                   /// Navegação correta para a tela de login
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const HomePage()),
+                    MaterialPageRoute(builder: (context) => const MainScreen()),
                   );
                 },
                 backgroundColor: Theme.of(context).colorScheme.primary,
