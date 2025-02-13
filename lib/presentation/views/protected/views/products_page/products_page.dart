@@ -8,7 +8,8 @@ class ProductsPage extends StatefulWidget {
   _ProductsPageState createState() => _ProductsPageState();
 }
 
-class _ProductsPageState extends State<ProductsPage> with SingleTickerProviderStateMixin {
+class _ProductsPageState extends State<ProductsPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   /// Lista de produtos dinâmica
@@ -48,9 +49,12 @@ class _ProductsPageState extends State<ProductsPage> with SingleTickerProviderSt
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               "Produtos Disponíveis",
-              style: TextStyle(fontSize: 22, color: Colors.black),
+              style: TextStyle(
+                fontSize: 24,
+                color: Theme.of(context).colorScheme.surface,
+              ),
             ),
             const SizedBox(height: 16),
             _buildSearchBar(),

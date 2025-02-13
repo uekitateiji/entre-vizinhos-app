@@ -22,7 +22,7 @@ class CustomButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(32),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
         ),

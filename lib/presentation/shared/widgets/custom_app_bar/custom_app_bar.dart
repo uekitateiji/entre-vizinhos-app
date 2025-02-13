@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String titleTop; // Texto superior (ex: "Condomínio")
-  final String titleBottom; // Texto inferior (ex: "Hype Living - Augusta")
+  final String? titleTop; // Ex: "Condomínio"
+  final String? titleBottom; // Ex: "Hype Living - Augusta"
   final IconData? icon;
   final VoidCallback? onIconPressed;
-  final List<Widget>? actions; // Agora aceita múltiplas ações
+  final List<Widget>? actions;
 
   const CustomAppBar({
     super.key,
-    required this.titleTop,
-    required this.titleBottom,
+    this.titleTop,
+    this.titleBottom,
     this.icon,
     this.onIconPressed,
     this.actions,
@@ -19,30 +19,45 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white, // Fundo branco
-      elevation: 0, // Remove sombra
-      automaticallyImplyLeading: false, // Remove o botão padrão de voltar
-      leading: icon != null
-          ? IconButton(
-              icon: Icon(icon, color: Colors.black),
-              onPressed: onIconPressed ?? () => Navigator.pop(context),
-            )
-          : null, // Se não tiver ícone, não exibe nada
+      backgroundColor: Colors.white,
+      elevation: 0,
+      automaticallyImplyLeading: false,
+      leading: _buildLeadingIcon(),
+      title: _buildTitle(context),
+      centerTitle: true,
+      actions: actions,
+    );
+  }
 
-      title: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
+  /// Ícone no canto esquerdo, opcional
+  Widget? _buildLeadingIcon() {
+    if (icon == null) return null;
+    return IconButton(
+      icon: Icon(icon, color: Colors.black),
+      onPressed: onIconPressed ?? () => Navigator.pop,
+    );
+  }
+
+  /// Título centralizado com um ou dois textos opcionais
+  Widget _buildTitle(BuildContext context) {
+    if (titleTop == null && titleBottom == null) return const SizedBox();
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (titleTop != null)
           Text(
-            titleTop,
+            titleTop!,
             style: const TextStyle(
               fontSize: 14,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.bold,
               color: Colors.grey,
             ),
           ),
+        if (titleBottom != null) ...[
           const SizedBox(height: 2),
           Text(
-            titleBottom,
+            titleBottom!,
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -50,13 +65,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
         ],
-      ),
-
-      centerTitle: true, // Centraliza os textos
-      actions: actions, // Adiciona os botões na AppBar
+      ],
     );
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(70); // Ajuste na altura para suportar dois textos
+  Size get preferredSize => const Size.fromHeight(70);
 }

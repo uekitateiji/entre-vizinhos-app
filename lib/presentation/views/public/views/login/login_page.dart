@@ -114,7 +114,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     Image.asset("assets/icons/icon-google.png", height: 24),
                     const SizedBox(width: 10),
-                    const Text("Log in with Google",
+                    const Text("Entrar com ",
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.black,
