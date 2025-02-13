@@ -1,197 +1,150 @@
+import 'package:entre_vizinhos_app/presentation/views/protected/views/home/home_page.dart';
 import 'package:flutter/material.dart';
-import '../password/password_page.dart';
 import '../../../../shared/widgets/widgets.dart';
 
 class LoginPage extends StatefulWidget {
-  final String? email;
-
-  const LoginPage({super.key, this.email});
+  const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  late TextEditingController _emailController;
-  final FocusNode _emailFocusNode = FocusNode();
-  
-  bool _isEmailValid = true;
-  bool _hasStartedTyping = false;
-  bool _shouldShowSuccessIcon = false;
-  String? _errorMessage;
-
-  @override
-  void initState() {
-    super.initState();
-    _emailController = TextEditingController(text: widget.email ?? "");
-
-    // Foca no campo após o carregamento da tela
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 300), () {
-        if (mounted) {
-          FocusScope.of(context).requestFocus(_emailFocusNode);
-        }
-      });
-    });
-
-    _emailController.addListener(_onTextChanged);
-  }
-
-  bool _validateEmail(String email) {
-    return RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(email);
-  }
-
-  void _onTextChanged() {
-    String email = _emailController.text.trim();
-    
-    if (!_hasStartedTyping && email.isNotEmpty) {
-      setState(() {
-        _hasStartedTyping = true;
-      });
-    }
-
-    if (_hasStartedTyping) {
-      bool isValid = _validateEmail(email);
-      
-      setState(() {
-        _isEmailValid = isValid;
-        _shouldShowSuccessIcon = isValid && email.isNotEmpty;
-        _errorMessage = isValid ? null : "Por favor, insira um e-mail válido!";
-      });
-    }
-  }
-
-  void _onEmailSubmit() async {
-    String email = _emailController.text.trim();
-    bool isValid = _validateEmail(email);
-
-    setState(() {
-      _isEmailValid = isValid;
-      _shouldShowSuccessIcon = isValid;
-      _errorMessage = isValid ? null : "Por favor, insira um e-mail válido!";
-    });
-
-    if (isValid) {
-      FocusScope.of(context).unfocus();
-
-      final returnedEmail = await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => PasswordPage(email: email)),
-      );
-
-      if (returnedEmail != null && returnedEmail is String) {
-        setState(() {
-          _emailController.text = returnedEmail;
-        });
-      }
-    }
-  }
+  bool isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      resizeToAvoidBottomInset: false,
-      appBar: const CustomAppBar(
-        icon: Icons.arrow_back,
-      ),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              "assets/background-right.png",
-              fit: BoxFit.cover,
-            ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Positioned(
-                          top: 100,
-                          left: screenWidth * 0.06,
-                          right: screenWidth * 0.06,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                "Acesse\nsua conta!",
-                                style: TextStyle(
-                                  height: 1,
-                                  fontSize: screenWidth * 0.12,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Poppins',
-                                  color: Colors.black,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              const Row(
-                                children: [
-                                  Text(
-                                    "Que bom te ver novamente! ",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontFamily: 'Poppins',
-                                      color: Colors.black54,
-                                    ),
-                                  ),
-                                  Icon(Icons.favorite,
-                                      color: Colors.red, size: 18),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        AnimatedPositioned(
-                          duration: const Duration(milliseconds: 200),
-                          bottom: keyboardHeight > 0
-                              ? keyboardHeight + 20
-                              : screenHeight * 0.4,
-                          left: screenWidth * 0.06,
-                          right: screenWidth * 0.06,
-                          child: Column(
-                            children: [
-                              ExpandedTextFormField(
-                                label: 'Digite o seu e-mail',
-                                onActionButton: _onEmailSubmit,
-                                error: !_isEmailValid,
-                                controller: _emailController,
-                                focusNode: _emailFocusNode,
-                                keyboardType: TextInputType.emailAddress,
-                                errorMessage: _errorMessage,
-                                isValid: _shouldShowSuccessIcon,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          children: [
+            /// Espaço superior
+            const Expanded(flex: 2, child: SizedBox()),
+
+            /// Campos de entrada
+            TextField(
+              decoration: InputDecoration(
+                hintText: "E-mail",
+                filled: true,
+                fillColor: Colors.grey[200],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            TextField(
+              obscureText: !isPasswordVisible,
+              decoration: InputDecoration(
+                hintText: "Senha",
+                filled: true,
+                fillColor: Colors.grey[200],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      isPasswordVisible = !isPasswordVisible;
+                    });
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "Esqueceu a senha?",
+              style: TextStyle(
+                color: Colors.grey[700],
+              ),
+            ),
+            const SizedBox(height: 48),
+            SizedBox(
+              width: double.infinity,
+              child: CustomButton(
+                text: "Acessar",
+                onPressed: () {
+                  /// Navegação correta para a tela de login
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomePage()),
+                  );
+                },
+                backgroundColor: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 32),
+            Row(
+              children: [
+                const Expanded(child: Divider(thickness: 1)),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text("ou",
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                      )),
+                ),
+                const Expanded(child: Divider(thickness: 1)),
+              ],
+            ),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: OutlinedButton(
+                onPressed: () {},
+                style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  side: const BorderSide(
+                    color: Colors.grey,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset("assets/icons/icon-google.png", height: 24),
+                    const SizedBox(width: 10),
+                    const Text("Log in with Google",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                        )),
+                  ],
+                ),
+              ),
+            ),
+
+            /// Espaço entre os botões e o texto final
+            const Expanded(flex: 1, child: SizedBox()),
+
+            /// Texto final "Não possui conta? Crie agora!"
+            GestureDetector(
+              onTap: () {
+                // Adicione a ação para ir para a tela de cadastro, se necessário
+              },
+              child: Text(
+                "Não possui conta? Crie agora!",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[700],
+                ),
+              ),
+            ),
+
+            /// Espaço inferior
+            const SizedBox(height: 68),
+          ],
+        ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _emailController.removeListener(_onTextChanged);
-    _emailController.dispose();
-    _emailFocusNode.dispose();
-    super.dispose();
   }
 }

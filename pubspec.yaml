@@ -49,13 +49,10 @@ dev_dependencies:
 
 flutter:
   assets:
-    - assets/background-boas-vindas.png
-    - assets/background-acessar-conta.png
-    - assets/background-left.png
-    - assets/background-right.png
     - assets/banner-1.png
     - assets/banner-2.png
     - assets/banner-3.png
+    - assets/icons/icon-google.png
   fonts:
   - family: Poppins
     fonts:
