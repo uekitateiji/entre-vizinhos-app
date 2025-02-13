@@ -1,4 +1,4 @@
-package com.example.entre_vizinhos_app
+package br.com.vizin
 
 import io.flutter.embedding.android.FlutterActivity
 
