@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../protected/views/main_screen.dart';
 import '../public/views/reset_password/reset_password_page.dart';
-
+import '../public/views/create_account_page/create_account_page.dart';
 class LoginViewModel extends ChangeNotifier {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -73,5 +73,13 @@ class LoginViewModel extends ChangeNotifier {
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
+  }
+
+  /// 🔹 **Navega para Criar Conta**
+  void navigateToCreateAccount(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CreateAccountPage()),
+    );
   }
 }

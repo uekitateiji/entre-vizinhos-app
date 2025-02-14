@@ -7,7 +7,8 @@ class IntroViewModel extends ChangeNotifier {
       'id': '1',
       'image': 'assets/banner-1.png',
       'title': 'O marketplace\nexclusivo para o seu\ncondomínio!',
-      'subtitle': 'Compre, venda e contrate serviços de forma\nrápida e segura, sem sair de casa.'
+      'subtitle':
+          'Compre, venda e contrate serviços de forma\nrápida e segura, sem sair de casa.'
     },
     {
       'id': '2',
@@ -19,7 +20,8 @@ class IntroViewModel extends ChangeNotifier {
       'id': '3',
       'image': 'assets/banner-3.png',
       'title': 'Anuncie e compre sem sair de casa!',
-      'subtitle': 'Venda o que não usa mais e encontre produtos incríveis dentro do seu condomínio.'
+      'subtitle':
+          'Venda o que não usa mais e encontre produtos incríveis dentro do seu condomínio.'
     },
   ];
 
@@ -74,8 +76,9 @@ class IntroViewModel extends ChangeNotifier {
 
   void previousSlide() {
     _progress = 0.0;
-    _currentIndex = _currentIndex == 0 ? slides.length - 1 : _currentIndex - 1;
-    notifyListeners();
+    if (_currentIndex > 0) {
+      _currentIndex -= 1;
+    }
   }
 
   Color getProgressColor(BuildContext context) {

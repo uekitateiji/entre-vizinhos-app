@@ -34,7 +34,7 @@ class EntreVizinhosApp extends StatelessWidget {
         error: const Color(0xffFF4D4D), // Vermelho para erros
       ),
       disabledColor: const Color(0xffDADADA), // Cinza para elementos desativados
-      scaffoldBackgroundColor: const Color(0xffF5F5F5),
+      scaffoldBackgroundColor: const Color(0xffFFFFFF),
       useMaterial3: true,
     );
   }

@@ -36,11 +36,21 @@ class _LoginPageContent extends StatelessWidget {
             const SizedBox(height: 16),
             _buildPasswordField(viewModel),
             const SizedBox(height: 32),
-            _buildLoginButton(viewModel, context),
+            CustomButton(
+              text: "Acessar",
+              onPressed: () => viewModel.login(context),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+            ),
             const SizedBox(height: 16),
-            _buildResetPasswordButton(viewModel, context),
+            CustomButton(
+              text: "Redefinir senha",
+              onPressed: () => viewModel.navigateToResetPassword(context),
+              backgroundColor: Colors.grey,
+            ),
             const SizedBox(height: 32),
-            Center(child: _buildSignupText()),
+            Center(
+              child: _buildSignupText(viewModel, context),
+            ),
           ],
         ),
       ),
@@ -65,7 +75,6 @@ class _LoginPageContent extends StatelessWidget {
           "Bem vindo, vizin!",
           style: TextStyle(
             fontSize: 16,
-            color: Colors.black54,
           ),
         ),
       ],
@@ -98,49 +107,16 @@ class _LoginPageContent extends StatelessWidget {
         fillColor: Colors.grey[200],
         border: _buildInputBorder(),
         prefixIcon: const Icon(Icons.lock, color: Colors.grey),
-        suffixIcon: IconButton(
-          icon: Icon(
-            viewModel.isPasswordVisible
-                ? Icons.visibility
-                : Icons.visibility_off,
-            color: Colors.grey,
-          ),
-          onPressed: viewModel.togglePasswordVisibility,
-        ),
         errorText: viewModel.passwordError, // Exibe erro abaixo do campo
       ),
     );
   }
 
-  /// 🔹 **Botão de Login**
-  Widget _buildLoginButton(LoginViewModel viewModel, BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: CustomButton(
-        text: "Acessar",
-        onPressed: () => viewModel.login(context),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-      ),
-    );
-  }
-
-  /// 🔹 **Botão de Redefinir Senha**
-  Widget _buildResetPasswordButton(LoginViewModel viewModel, BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: CustomButton(
-        text: "Redefinir senha",
-        onPressed: () => viewModel.navigateToResetPassword(context),
-        backgroundColor: Colors.grey,
-      ),
-    );
-  }
-
   /// 🔹 **Texto "Não possui conta? Crie agora!"**
-  Widget _buildSignupText() {
+  Widget _buildSignupText(LoginViewModel viewModel, context) {
     return GestureDetector(
       onTap: () {
-        // Ação para cadastro
+        viewModel.navigateToCreateAccount(context);
       },
       child: Text(
         "Não possui conta? Crie agora!",
