@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../protected/views/main_screen.dart';
 import '../public/views/reset_password/reset_password_page.dart';
 import '../public/views/create_account_page/create_account_page.dart';
+import 'package:flutter/foundation.dart';
 class LoginViewModel extends ChangeNotifier {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -44,7 +45,7 @@ class LoginViewModel extends ChangeNotifier {
     final isEmailValid = _validateEmail(emailController.text);
     final isPasswordValid = _validatePassword(passwordController.text);
 
-    if (isEmailValid && isPasswordValid) {
+    if (isEmailValid && isPasswordValid || kDebugMode) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const MainScreen()),

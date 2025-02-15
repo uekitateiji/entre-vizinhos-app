@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'presentation/views/public/views/intro/intro_page.dart';
+import 'providers/banner_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Inicializa o Firebase
 
-  runApp(const EntreVizinhosApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => BannerProvider()), // 🔹 Adicionando o Provider
+      ],
+      child: const EntreVizinhosApp(),
+    ),
+  );
 }
 
 class EntreVizinhosApp extends StatelessWidget {
@@ -18,7 +27,7 @@ class EntreVizinhosApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: "Entre Vizinhos",
       theme: _buildTheme(),
-      home: const IntroPage(),
+      home: IntroPage(),
     );
   }
 
