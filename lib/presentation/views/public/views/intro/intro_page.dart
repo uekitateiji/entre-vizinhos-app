@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../shared/widgets/widgets.dart';
 import '../../../auth/login_page.dart';
-import '../../../../../providers/banner_provider.dart';
 import 'intro_view_model.dart';
 
 class IntroPage extends StatelessWidget {
@@ -10,13 +9,8 @@ class IntroPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => IntroViewModel()),
-        ChangeNotifierProvider(
-          create: (_) => BannerProvider()..loadBanners(),
-        ),
-      ],
+    return ChangeNotifierProvider(
+      create: (_) => IntroViewModel(),
       child: const _IntroPageContent(),
     );
   }
@@ -28,15 +22,14 @@ class _IntroPageContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<IntroViewModel>();
-    final bannerProvider = context.watch<BannerProvider>();
 
-    if (bannerProvider.banners.isEmpty || viewModel.currentIndex >= bannerProvider.banners.length) {
+    if (viewModel.isLoading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
-    final slide = bannerProvider.banners[viewModel.currentIndex];
+    final slide = viewModel.currentSlide;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -51,9 +44,9 @@ class _IntroPageContent extends StatelessWidget {
             SafeArea(
               child: Column(
                 children: [
-                  _buildProgressIndicator(context, viewModel, bannerProvider.banners),
+                  _buildProgressIndicator(context, viewModel),
                   const SizedBox(height: 32),
-                  _buildTitle(), // Adicionando o título "VIZIN"
+                  _buildTitle(),
                   const Spacer(),
                   _buildSlideContent(context, slide),
                 ],
@@ -65,10 +58,10 @@ class _IntroPageContent extends StatelessWidget {
     );
   }
 
-  /// 🔹 **Título "VIZIN" posicionado no topo**
+  /// 🔹 **Título "VIZIN"**
   Widget _buildTitle() {
     return const Padding(
-      padding: EdgeInsets.only(top: 16), // Ajuste para alinhar corretamente
+      padding: EdgeInsets.only(top: 16),
       child: Text(
         "VIZIN",
         style: TextStyle(
@@ -81,19 +74,25 @@ class _IntroPageContent extends StatelessWidget {
     );
   }
 
+  /// 🔹 **Navegação entre slides**
   void _handleSlideNavigation(TapUpDetails details, BuildContext context, IntroViewModel viewModel) {
     final screenWidth = MediaQuery.of(context).size.width;
-    details.localPosition.dx > screenWidth / 2 ? viewModel.nextSlide() : viewModel.previousSlide();
+    if (details.localPosition.dx > screenWidth / 2) {
+      viewModel.nextSlide();
+    } else {
+      viewModel.previousSlide();
+    }
   }
 
-  Widget _buildBackgroundImage(Map<String, dynamic> slide) {
+  /// 🔹 **Imagem de fundo**
+  Widget _buildBackgroundImage(Map<String, String> slide) {
     return AnimatedSwitcher(
       duration: const Duration(seconds: 1),
       transitionBuilder: (Widget child, Animation<double> animation) {
         return FadeTransition(opacity: animation, child: child);
       },
-      child: Image.network(
-        slide['image_url'] ?? '',
+      child: Image.asset(
+        slide['image'] ?? '',
         key: ValueKey(slide['id']),
         width: double.infinity,
         height: double.infinity,
@@ -105,19 +104,20 @@ class _IntroPageContent extends StatelessWidget {
     );
   }
 
-  Widget _buildProgressIndicator(BuildContext context, IntroViewModel viewModel, List banners) {
+  /// 🔹 **Indicador de progresso corrigido**
+  Widget _buildProgressIndicator(BuildContext context, IntroViewModel viewModel) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Row(
         children: List.generate(
-          banners.length,
+          viewModel.slides.length,
           (index) => Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Stack(
                 children: [
                   _buildProgressBackground(),
-                  _buildProgressBar(context, viewModel, index, banners.length),
+                  _buildProgressBar(context, viewModel, index),
                 ],
               ),
             ),
@@ -127,6 +127,7 @@ class _IntroPageContent extends StatelessWidget {
     );
   }
 
+  /// 🔹 **Fundo do indicador de progresso**
   Widget _buildProgressBackground() {
     return Container(
       height: 4,
@@ -137,15 +138,18 @@ class _IntroPageContent extends StatelessWidget {
     );
   }
 
-  Widget _buildProgressBar(BuildContext context, IntroViewModel viewModel, int index, int totalSlides) {
+  /// 🔹 **Correção no progresso da barra**
+  Widget _buildProgressBar(BuildContext context, IntroViewModel viewModel, int index) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 100),
       height: 4,
-      width: index == viewModel.currentIndex
-          ? viewModel.progress * MediaQuery.of(context).size.width / totalSlides
-          : 0,
+      width: (index < viewModel.currentIndex)
+          ? MediaQuery.of(context).size.width / viewModel.slides.length
+          : (index == viewModel.currentIndex)
+              ? (viewModel.progress * MediaQuery.of(context).size.width / viewModel.slides.length)
+              : 0,
       decoration: BoxDecoration(
-        color: index == viewModel.currentIndex
+        color: index <= viewModel.currentIndex
             ? Theme.of(context).colorScheme.primary
             : Colors.transparent,
         borderRadius: BorderRadius.circular(4),
@@ -153,7 +157,8 @@ class _IntroPageContent extends StatelessWidget {
     );
   }
 
-  Widget _buildSlideContent(BuildContext context, Map<String, dynamic> slide) {
+  /// 🔹 **Conteúdo do slide**
+  Widget _buildSlideContent(BuildContext context, Map<String, String> slide) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
       child: Column(
@@ -168,7 +173,8 @@ class _IntroPageContent extends StatelessWidget {
     );
   }
 
-  Widget _buildSlideText(Map<String, dynamic> slide) {
+  /// 🔹 **Texto do slide**
+  Widget _buildSlideText(Map<String, String> slide) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -178,13 +184,14 @@ class _IntroPageContent extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text(
-          slide['description'] ?? '',
+          slide['subtitle'] ?? '',
           style: const TextStyle(fontSize: 16, color: Colors.white70),
         ),
       ],
     );
   }
 
+  /// 🔹 **Botão "Vamos lá!"**
   Widget _buildActionButton(BuildContext context) {
     return Center(
       child: CustomButton(
