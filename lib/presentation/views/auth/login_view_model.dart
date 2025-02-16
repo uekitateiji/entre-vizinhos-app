@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import '../../../../../services/user_service.dart';
 import '../protected/views/main_screen.dart';
 import '../public/views/reset_password/reset_password_page.dart';
 import '../public/views/create_account_page/create_account_page.dart';
-import 'package:flutter/foundation.dart';
+
 class LoginViewModel extends ChangeNotifier {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   bool isPasswordVisible = false;
+  bool isLoading = false;
   String? emailError;
   String? passwordError;
+  String? errorMessage;
 
-  /// Valida o e-mail digitado
+  /// 🔹 **Valida e-mail**
   bool _validateEmail(String email) {
     if (email.isEmpty) {
       emailError = "Email obrigatório!";
@@ -26,7 +29,7 @@ class LoginViewModel extends ChangeNotifier {
     return true;
   }
 
-  /// Valida a senha digitada
+  /// 🔹 **Valida senha**
   bool _validatePassword(String password) {
     if (password.isEmpty) {
       passwordError = "Senha obrigatória!";
@@ -40,22 +43,48 @@ class LoginViewModel extends ChangeNotifier {
     return true;
   }
 
-  /// Executa a validação e navega se estiver tudo certo
-  void login(BuildContext context) {
+  /// 🔹 **Autenticar usuário**
+  Future<bool> login(BuildContext context) async {
     final isEmailValid = _validateEmail(emailController.text);
     final isPasswordValid = _validatePassword(passwordController.text);
 
-    if (isEmailValid && isPasswordValid || kDebugMode) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const MainScreen()),
-      );
+    if (!isEmailValid || !isPasswordValid) {
+      notifyListeners(); // Exibir erros nos campos
+      return false;
     }
 
-    notifyListeners(); // Atualiza a tela para exibir os erros se existirem
+    isLoading = true;
+    errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await UserService.loginUser(
+        emailController.text,
+        passwordController.text,
+      );
+
+      if (response.containsKey('token')) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Login realizado com sucesso!")),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainScreen()), // Redireciona para a home
+        );
+        return true;
+      } else {
+        errorMessage = "E-mail ou senha incorretos.";
+      }
+    } catch (e) {
+      errorMessage = "Erro ao fazer login: ${e.toString()}";
+    }
+
+    isLoading = false;
+    notifyListeners();
+    return false;
   }
 
-  /// Navega para a tela de redefinição de senha
+  /// 🔹 **Navega para redefinição de senha**
   void navigateToResetPassword(BuildContext context) {
     Navigator.push(
       context,
@@ -63,7 +92,15 @@ class LoginViewModel extends ChangeNotifier {
     );
   }
 
-  /// Alterna a visibilidade da senha
+  /// 🔹 **Navega para Criar Conta**
+  void navigateToCreateAccount(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CreateAccountPage()),
+    );
+  }
+
+  /// 🔹 **Alterna visibilidade da senha**
   void togglePasswordVisibility() {
     isPasswordVisible = !isPasswordVisible;
     notifyListeners();
@@ -74,13 +111,5 @@ class LoginViewModel extends ChangeNotifier {
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
-  }
-
-  /// 🔹 **Navega para Criar Conta**
-  void navigateToCreateAccount(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const CreateAccountPage()),
-    );
   }
 }

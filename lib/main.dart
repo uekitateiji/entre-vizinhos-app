@@ -1,3 +1,4 @@
+import 'package:entre_vizinhos_app/presentation/views/public/views/intro/intro_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +12,11 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => BannerProvider()), // 🔹 Adicionando o Provider
+        ChangeNotifierProvider(
+            create: (context) => BannerProvider()), // 🔹 Provider do Banner
+        ChangeNotifierProvider(
+            create: (context) =>
+                IntroViewModel()), // 🔹 Provider do IntroViewModel
       ],
       child: const EntreVizinhosApp(),
     ),
@@ -27,7 +32,7 @@ class EntreVizinhosApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: "Entre Vizinhos",
       theme: _buildTheme(),
-      home: IntroPage(),
+      home: const IntroPage(),
     );
   }
 
@@ -42,7 +47,8 @@ class EntreVizinhosApp extends StatelessWidget {
         surface: Colors.white, // Cor de fundo dos cards
         error: const Color(0xffFF4D4D), // Vermelho para erros
       ),
-      disabledColor: const Color(0xffDADADA), // Cinza para elementos desativados
+      disabledColor:
+          const Color(0xffDADADA), // Cinza para elementos desativados
       scaffoldBackgroundColor: const Color(0xffFFFFFF),
       useMaterial3: true,
     );

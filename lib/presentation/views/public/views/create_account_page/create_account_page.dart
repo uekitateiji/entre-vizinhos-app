@@ -40,6 +40,8 @@ class _CreateAccountPageContent extends StatelessWidget {
             _buildConfirmPasswordField(viewModel),
             const SizedBox(height: 32),
             _buildCreateAccountButton(viewModel, context),
+            if (viewModel.errorMessage?.isNotEmpty == true)
+              _buildErrorMessage(viewModel), // ✅ Correção aplicada
           ],
         ),
       ),
@@ -66,87 +68,128 @@ class _CreateAccountPageContent extends StatelessWidget {
 
   /// 🔹 **Campo de Nome**
   Widget _buildNameField(CreateAccountViewModel viewModel) {
-    return TextField(
+    return _buildTextField(
       controller: viewModel.nameController,
-      decoration: InputDecoration(
-        hintText: "Nome Completo",
-        filled: true,
-        fillColor: Colors.grey[200],
-        border: _buildInputBorder(),
-        prefixIcon: const Icon(Icons.person, color: Colors.grey),
-        errorText: viewModel.nameError,
-      ),
+      hintText: "Nome Completo",
+      icon: Icons.person,
+      errorText: viewModel.nameError,
     );
   }
 
   /// 🔹 **Campo de E-mail**
   Widget _buildEmailField(CreateAccountViewModel viewModel) {
-    return TextField(
+    return _buildTextField(
       controller: viewModel.emailController,
-      decoration: InputDecoration(
-        hintText: "Email",
-        filled: true,
-        fillColor: Colors.grey[200],
-        border: _buildInputBorder(),
-        prefixIcon: const Icon(Icons.email, color: Colors.grey),
-        errorText: viewModel.emailError,
-      ),
+      hintText: "Email",
+      icon: Icons.email,
+      errorText: viewModel.emailError,
     );
   }
 
   /// 🔹 **Campo de Senha**
   Widget _buildPasswordField(CreateAccountViewModel viewModel) {
-    return TextField(
+    return _buildTextField(
       controller: viewModel.passwordController,
+      hintText: "Senha",
+      icon: Icons.lock,
+      errorText: viewModel.passwordError,
       obscureText: !viewModel.isPasswordVisible,
-      decoration: InputDecoration(
-        hintText: "Senha",
-        filled: true,
-        fillColor: Colors.grey[200],
-        border: _buildInputBorder(),
-        prefixIcon: const Icon(Icons.lock, color: Colors.grey),
-        errorText: viewModel.passwordError,
-        suffixIcon: IconButton(
-          icon: Icon(
-            viewModel.isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            color: Colors.grey,
-          ),
-          onPressed: viewModel.togglePasswordVisibility,
+      suffixIcon: IconButton(
+        icon: Icon(
+          viewModel.isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+          color: Colors.grey,
         ),
+        onPressed: viewModel.togglePasswordVisibility,
       ),
     );
   }
 
   /// 🔹 **Campo de Confirmação de Senha**
   Widget _buildConfirmPasswordField(CreateAccountViewModel viewModel) {
-    return TextField(
+    return _buildTextField(
       controller: viewModel.confirmPasswordController,
+      hintText: "Confirme a Senha",
+      icon: Icons.check,
+      errorText: viewModel.confirmPasswordError,
       obscureText: !viewModel.isConfirmPasswordVisible,
+      suffixIcon: IconButton(
+        icon: Icon(
+          viewModel.isConfirmPasswordVisible
+              ? Icons.visibility
+              : Icons.visibility_off,
+          color: Colors.grey,
+        ),
+        onPressed: viewModel.toggleConfirmPasswordVisibility,
+      ),
+    );
+  }
+
+  /// 🔹 **Campo de Texto Reutilizável**
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hintText,
+    required IconData icon,
+    String? errorText,
+    bool obscureText = false,
+    Widget? suffixIcon,
+  }) {
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
       decoration: InputDecoration(
-        hintText: "Confirme a Senha",
+        hintText: hintText,
         filled: true,
         fillColor: Colors.grey[200],
         border: _buildInputBorder(),
-        prefixIcon: const Icon(Icons.lock, color: Colors.grey),
-        errorText: viewModel.confirmPasswordError,
-        suffixIcon: IconButton(
-          icon: Icon(
-            viewModel.isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            color: Colors.grey,
-          ),
-          onPressed: viewModel.toggleConfirmPasswordVisibility,
-        ),
+        prefixIcon: Icon(icon, color: Colors.grey),
+        errorText: errorText,
+        suffixIcon: suffixIcon,
       ),
     );
   }
 
   /// 🔹 **Botão de Criar Conta**
-  Widget _buildCreateAccountButton(CreateAccountViewModel viewModel, BuildContext context) {
+  Widget _buildCreateAccountButton(
+      CreateAccountViewModel viewModel, BuildContext context) {
     return CustomButton(
-      text: "Criar Conta",
-      onPressed: () => viewModel.createAccount(context),
+      text: viewModel.isLoading ? "Criando..." : "Criar Conta",
+      onPressed: viewModel.isLoading
+          ? () {}
+          : () => _handleCreateAccount(viewModel, context),
       backgroundColor: Theme.of(context).colorScheme.primary,
     );
+  }
+
+  /// 🔹 **Mensagem de erro**
+  Widget _buildErrorMessage(CreateAccountViewModel viewModel) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Text(
+        viewModel.errorMessage ?? "Erro desconhecido", // ✅ Correção aplicada
+        style: const TextStyle(color: Colors.red),
+      ),
+    );
+  }
+
+  /// 🔹 **Valida e chama a API**
+  void _handleCreateAccount(
+      CreateAccountViewModel viewModel, BuildContext context) async {
+    final success = await viewModel.createAccount(context);
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Conta criada com sucesso!")),
+      );
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(viewModel.errorMessage?.isNotEmpty == true
+              ? viewModel.errorMessage!
+              : "Erro ao criar conta"), // ✅ Correção aplicada
+        ),
+      );
+    }
   }
 
   /// 🔹 **Borda padrão dos campos de entrada**
@@ -158,7 +201,7 @@ class _CreateAccountPageContent extends StatelessWidget {
   }
 
   /// 🔹 **AppBar personalizada**
-  PreferredSizeWidget _buildAppBar(context) {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     return CustomAppBar(
       icon: Icons.arrow_back,
       onIconPressed: () {

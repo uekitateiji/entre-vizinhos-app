@@ -36,21 +36,13 @@ class _LoginPageContent extends StatelessWidget {
             const SizedBox(height: 16),
             _buildPasswordField(viewModel),
             const SizedBox(height: 32),
-            CustomButton(
-              text: "Acessar",
-              onPressed: () => viewModel.login(context),
-              backgroundColor: Theme.of(context).colorScheme.primary,
-            ),
+            _buildLoginButton(viewModel, context),
             const SizedBox(height: 16),
-            CustomButton(
-              text: "Redefinir senha",
-              onPressed: () => viewModel.navigateToResetPassword(context),
-              backgroundColor: Colors.grey,
-            ),
+            _buildResetPasswordButton(viewModel, context),
             const SizedBox(height: 32),
-            Center(
-              child: _buildSignupText(viewModel, context),
-            ),
+            _buildSignupText(viewModel, context),
+            if (viewModel.errorMessage?.isNotEmpty == true)
+              _buildErrorMessage(viewModel),
           ],
         ),
       ),
@@ -63,7 +55,7 @@ class _LoginPageContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Fazer Login",
+          "Fazer login",
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
@@ -72,10 +64,8 @@ class _LoginPageContent extends StatelessWidget {
         ),
         SizedBox(height: 4),
         Text(
-          "Bem vindo, vizin!",
-          style: TextStyle(
-            fontSize: 16,
-          ),
+          "Bem-vindo, vizin!",
+          style: TextStyle(fontSize: 16),
         ),
       ],
     );
@@ -91,7 +81,7 @@ class _LoginPageContent extends StatelessWidget {
         fillColor: Colors.grey[200],
         border: _buildInputBorder(),
         prefixIcon: const Icon(Icons.email, color: Colors.grey),
-        errorText: viewModel.emailError, // Exibe erro abaixo do campo
+        errorText: viewModel.emailError,
       ),
     );
   }
@@ -107,22 +97,83 @@ class _LoginPageContent extends StatelessWidget {
         fillColor: Colors.grey[200],
         border: _buildInputBorder(),
         prefixIcon: const Icon(Icons.lock, color: Colors.grey),
-        errorText: viewModel.passwordError, // Exibe erro abaixo do campo
+        errorText: viewModel.passwordError,
+        suffixIcon: IconButton(
+          icon: Icon(
+            viewModel.isPasswordVisible
+                ? Icons.visibility
+                : Icons.visibility_off,
+            color: Colors.grey,
+          ),
+          onPressed: viewModel.togglePasswordVisibility,
+        ),
       ),
     );
   }
 
+  /// 🔹 **Botão de Login**
+  Widget _buildLoginButton(LoginViewModel viewModel, BuildContext context) {
+    return CustomButton(
+      text: viewModel.isLoading ? "Entrando..." : "Acessar",
+      onPressed:
+          viewModel.isLoading ? () {} : () => _handleLogin(viewModel, context),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+    );
+  }
+
+  /// 🔹 **Botão de Redefinir Senha**
+  Widget _buildResetPasswordButton(
+      LoginViewModel viewModel, BuildContext context) {
+    return CustomButton(
+      text: "Redefinir senha",
+      onPressed: () => viewModel.navigateToResetPassword(context),
+      backgroundColor: Colors.grey,
+    );
+  }
+
   /// 🔹 **Texto "Não possui conta? Crie agora!"**
-  Widget _buildSignupText(LoginViewModel viewModel, context) {
-    return GestureDetector(
-      onTap: () {
-        viewModel.navigateToCreateAccount(context);
-      },
-      child: Text(
-        "Não possui conta? Crie agora!",
-        style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+  Widget _buildSignupText(LoginViewModel viewModel, BuildContext context) {
+    return Center(
+      child: GestureDetector(
+        onTap: () => viewModel.navigateToCreateAccount(context),
+        child: Text(
+          "Não possui conta? Crie agora!",
+          style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+        ),
       ),
     );
+  }
+
+  /// 🔹 **Mensagem de Erro**
+  Widget _buildErrorMessage(LoginViewModel viewModel) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Center(
+        child: Text(
+          viewModel.errorMessage!,
+          style: const TextStyle(color: Colors.red),
+        ),
+      ),
+    );
+  }
+
+  /// 🔹 **Executa o Login**
+  void _handleLogin(LoginViewModel viewModel, BuildContext context) async {
+    final success = await viewModel.login(context);
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Login realizado com sucesso!")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(viewModel.errorMessage?.isNotEmpty == true
+              ? viewModel.errorMessage!
+              : "Erro ao realizar login"),
+        ),
+      );
+    }
   }
 
   /// 🔹 **Borda padrão dos campos de entrada**
@@ -134,9 +185,10 @@ class _LoginPageContent extends StatelessWidget {
   }
 
   /// 🔹 **AppBar personalizada**
-  PreferredSizeWidget _buildAppBar(context) {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     return CustomAppBar(
       icon: Icons.arrow_back,
+      titleTop: 'VIZIN',
       onIconPressed: () {
         Navigator.pop(context);
       },

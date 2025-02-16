@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../../services/user_service.dart';
 
 class CreateAccountViewModel extends ChangeNotifier {
   final TextEditingController nameController = TextEditingController();
@@ -8,7 +9,9 @@ class CreateAccountViewModel extends ChangeNotifier {
 
   bool isPasswordVisible = false;
   bool isConfirmPasswordVisible = false;
-  
+  bool isLoading = false;
+  String? errorMessage;
+
   String? nameError;
   String? emailError;
   String? passwordError;
@@ -67,21 +70,45 @@ class CreateAccountViewModel extends ChangeNotifier {
     return true;
   }
 
-  /// 🔹 **Criar Conta**
-  void createAccount(BuildContext context) {
+  /// 🔹 **Criar Conta e Chamar API**
+  Future<bool> createAccount(BuildContext context) async {
     final isNameValid = _validateName(nameController.text);
     final isEmailValid = _validateEmail(emailController.text);
     final isPasswordValid = _validatePassword(passwordController.text);
     final isConfirmPasswordValid = _validateConfirmPassword(passwordController.text, confirmPasswordController.text);
 
-    if (isNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Conta criada com sucesso!")),
-      );
-      Navigator.pop(context); // Retorna para a tela de login
+    if (!isNameValid || !isEmailValid || !isPasswordValid || !isConfirmPasswordValid) {
+      notifyListeners();
+      return false;
     }
 
+    isLoading = true;
+    errorMessage = null;
     notifyListeners();
+
+    try {
+      final success = await UserService.createUser(
+        nameController.text,
+        emailController.text,
+        passwordController.text,
+      );
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Conta criada com sucesso!")),
+        );
+        Navigator.pop(context); // Retorna para a tela de login
+        return true;
+      } else {
+        errorMessage = "Erro ao criar conta. Tente novamente.";
+      }
+    } catch (e) {
+      errorMessage = "Erro ao criar conta: ${e.toString()}";
+    }
+
+    isLoading = false;
+    notifyListeners();
+    return false;
   }
 
   /// 🔹 **Alterna visibilidade das senhas**
